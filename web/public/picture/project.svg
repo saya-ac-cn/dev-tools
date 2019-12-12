@@ -1,0 +1,7 @@
+<svg width="300px" height="25px" version="1.1"
+     xmlns="http://www.w3.org/2000/svg">
+    <text x="0" y="20" fill="#A09FA2" font-size="1.5em">Dev-</text>
+    <text x="55" y="20" fill="#F99822" font-size="1.5em">Tools</text>
+    <text x="120" y="20" fill="#A09FA2" font-size="1.5em">项目开发</text>
+    <text x="215" y="20" fill="#F99822" font-size="1.5em">工具箱</text>
+</svg>

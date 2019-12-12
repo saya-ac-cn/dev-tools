@@ -1,0 +1,278 @@
+﻿<style>
+    .container{
+        color: #353535
+    }
+    .envelope {
+        width: 100%;
+        height: 35px;
+        background: rgba(255, 255, 255, 0) url(/public/picture/envolope.svg) repeat-x
+    }
+    .section{
+        padding-top: 3em;
+        padding-left: 3em;
+        padding-right: 3em;
+    }
+    .use-info{
+        font-size: 1.2em;
+    }
+    .use-info .use-info-detail{
+        text-indent:60px
+    }
+    .dev-db,.test-db,.pro-db{
+        font-size: 0.8em;
+    }
+    .form-div{
+             margin-top: 60px;
+             padding-left: 120px;
+             padding-right: 120px;
+    }
+    .form-div .line-div{
+        height: 60px;
+        display: flex;
+        display: -webkit-flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        margin-bottom: 1em;
+        background: rgba(255, 255, 255, 0) url(/public/picture/input-label.svg) no-repeat left bottom;
+    }
+
+    .form-div .line-div .label-div{
+        width: 160px;
+        height: 100%;
+        display: flex;
+        display: -webkit-flex;
+        align-items: center;
+        justify-content:flex-end;
+        padding-right: 10px;
+        line-height: 30px;
+    }
+    .form-div .line-div .input-div{
+        width: 440px;
+        height: 100%;
+        display: flex;
+        display: -webkit-flex;
+        align-items: center;
+        justify-content:flex-start;
+        padding-left: 10px;
+    }
+
+    .form-div .line-div .input-div input{
+        border: 0;
+        height: 30px;
+        outline:none;
+        width: 95%;
+        background-color:transparent;
+    }
+    #publish{
+        width: 120px;
+        height: 30px;
+        border-radius: 3px;
+        outline:none;
+        font-size: 1.0em;
+        color: #353535;
+        background-color: rgb(244,164,52);
+    }
+</style>
+
+<div class="container">
+    <div class="envelope"></div>
+    <div class="section use-info">
+        <div>操作说明：</div>
+        <div class="use-info-detail">
+            同一个页面只能操作修改一个数据库，如需要操作多个数据库，请在主页选择好数据库后，再执行其它的操作。在正式发布前，请根据上一个已发布
+            到测试环境的版本号和线上数据库版本号确定本次的版本号，然后选择要发布到内容，最后保存提交执行保存。
+        </div>
+    </div>
+    <div class="section test-db table-responsive">
+        <table class="table table-bordered">
+            <caption>最近发布到测试的5个版本</caption>
+            <thead>
+            <tr>
+                <th>id</th>
+                <th>测试版本号</th>
+                <th>发布时间</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{if gt (len .Data.test) 0}}
+                {{range $i, $v := .Data.test}}
+                    <tr>
+                        <td>{{ $v.Id }}</td>
+                        <td><a href="/tools/api/testinfo?id={{ $v.Id }}" style="font-weight:bold" target="_blank">{{ $v.VersionId }}</a></td>
+                        <td>{{ $v.PublishTime }}</td>
+                    </tr>
+                {{end}}
+            {{else}}
+                <tr>
+                    <td colspan="5" style="text-align: center">没有进行中变更</td>
+                </tr>
+            {{end}}
+            </tbody>
+        </table>
+    </div>
+    <div class="section pro-db table-responsive">
+        <table class="table table-bordered">
+            <caption>最近发布到线上的5个版本</caption>
+            <thead>
+            <tr>
+                <th>id</th>
+                <th>线上版本号</th>
+                <th>发布时间</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{if gt (len .Data.pro) 0}}
+                {{range $i, $v := .Data.pro}}
+                    <tr>
+                        <td>{{ $v.Id }}</td>
+                        <td><a href="/tools/api/proinfo?id={{ $v.Id }}" style="font-weight:bold" target="_blank">{{ $v.VersionId }}</a></td>
+                        <td>{{ $v.PublishTime }}</td>
+                    </tr>
+                {{end}}
+            {{else}}
+                <tr>
+                    <td colspan="5" style="text-align: center">没有进行中变更</td>
+                </tr>
+            {{end}}
+            </tbody>
+        </table>
+    </div>
+    <div class="section dev-db table-responsive">
+        <table class="table table-bordered">
+            <caption>开发库剩余未发布到测试内容</caption>
+            <thead>
+            <tr>
+                <th><input id="checkAll" type="checkbox"/></th>
+                <th>所在库</th>
+                <th>变更者</th>
+                <th>变更项</th>
+                <th>变更原因</th>
+                <th>变更时间</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{if gt (len .Data.dev) 0}}
+                {{range $i, $v := .Data.dev}}
+                    <tr>
+                        <td><input name="devCheck" class="devCheck" type="checkbox" value="{{$v.Id}}"/></td>
+                        <td>{{ $v.DBName }}</td>
+                        <td>{{ $v.UserName }}</td>
+                        <td>{{ $v.DBItem }}</td>
+                        <td>{{ $v.DBReason }}</td>
+                        <td>{{ $v.CreateTime }}</td>
+                    </tr>
+                {{end}}
+            {{else}}
+                <tr>
+                    <td colspan="5" style="text-align: center">没有进行中变更</td>
+                </tr>
+            {{end}}
+            </tbody>
+        </table>
+    </div>
+    {{if gt (len .Data.dev) 0}}
+    <div class="form-div">
+        <div class="line-div">
+            <div class="label-div">测试版本号：</div>
+            <div class="input-div"><input type="text" id="dbVersion" maxlength="60" autocomplete="off" placeholder="请填写版本号"></div>
+        </div>
+        <div class="line-div">
+            <div class="label-div"></div>
+            <div class="input-div"><button id="publish" type="button">确定</button></div>
+        </div>
+    </div>
+    {{end}}
+    <div class="envelope"></div>
+</div>
+<script type="text/javascript">
+    // 定义一个本页面全局的数据库id，当前页面只能对同一个数据库操作
+    var dbId = {{.DbId}};
+    // 定义一个数据表对象数组
+    var table = [];
+    $(function(){
+
+        // 点击后的事件全选&全部取消事件
+        $("#checkAll").change(function() {
+            if ($("#checkAll").is(':checked')){
+                $("[name='devCheck']").prop('checked', true);
+            } else {
+                $("[name='devCheck']").prop('checked', false);
+            }
+        });
+
+        // 每一项的选择&取消事件
+        $(".devCheck").change(function () {
+            // 已选中数量
+            var checkedLen = $("[name='devCheck']:checked").length;
+            // 总共复选框数量
+            var checkboxLen = $("[name='devCheck']").length;
+            if (checkedLen == checkboxLen && checkboxLen != 0){
+                // 置全选为选中
+                $("#checkAll").prop('checked', true);
+            } else {
+                // 放弃全选
+                $("#checkAll").prop('checked', false);
+            }
+        })
+
+        // 响应用户提交事件
+        $("#publish").click(function(){
+            var dbVersion = $("#dbVersion").val().trim();
+            if(isBank(dbVersion)){
+                zeroModal.error('请填写版本号!');
+            }else{
+                if ($("[name='devCheck']:checked").length >0){
+                    var sendData = new Array();
+                    $("[name='devCheck']:checked").each(function(){
+                        sendData.push({"DevId":parseInt($(this).val())})
+                    });
+                    submit(sendData,dbVersion)
+                } else {
+                    zeroModal.error('请选择要发布的内容!');
+                }
+            }
+        });
+
+    });
+
+    // 验证表单数据
+    function isBank(value){
+        if (value == null || value == "") {
+            return true
+        }else {
+            return false
+        }
+    }
+
+
+    function submit(devId,version) {
+        zeroModal.confirm("您确认发布到测试",function () {
+            $.ajax({
+                //请求方式
+                type : "POST",
+                //请求地址
+                url : "/db/version/test?versionId="+version,
+                dataType : "json",//返回的数据类型
+                async: false,
+                //数据，json字符串
+                data : JSON.stringify(devId),
+                //请求成功
+                success : function(result) {
+                    console.log(result.Data)
+                    if(result.Code == 0){
+                        // 移除成功后强制刷新当前页面
+                        window.location.reload()
+                    }else{
+                        zeroModal.error(result.Msg);
+                    }
+                },
+                //请求失败，包含具体的错误信息
+                error : function(err){
+                    zeroModal.error('请求接口失败'+err);
+                }
+            });
+        })
+    }
+
+</script>

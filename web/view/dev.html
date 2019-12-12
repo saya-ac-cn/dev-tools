@@ -1,0 +1,292 @@
+﻿<style>
+    .container{
+        color: #353535
+    }
+    .envelope {
+        width: 100%;
+        height: 35px;
+        background: rgba(255, 255, 255, 0) url(/public/picture/envolope.svg) repeat-x
+    }
+    .section{
+        padding-top: 3em;
+        padding-left: 3em;
+        padding-right: 3em;
+    }
+    .use-info{
+        font-size: 1.2em;
+    }
+    .use-info .use-info-detail{
+        text-indent:60px
+    }
+    .dev-db, .add-db{
+        font-size: 0.8em;
+    }
+    .form-div{
+             margin-top: 60px;
+             padding-left: 120px;
+             padding-right: 120px;
+    }
+    .form-div .line-div{
+        height: 60px;
+        display: flex;
+        display: -webkit-flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        margin-bottom: 1em;
+        background: rgba(255, 255, 255, 0) url(/public/picture/input-label.svg) no-repeat left bottom;
+    }
+
+    .form-div .line-div .label-div{
+        width: 160px;
+        height: 100%;
+        display: flex;
+        display: -webkit-flex;
+        align-items: center;
+        justify-content:flex-end;
+        padding-right: 10px;
+        line-height: 30px;
+    }
+    .form-div .line-div .input-div{
+        width: 440px;
+        height: 100%;
+        display: flex;
+        display: -webkit-flex;
+        align-items: center;
+        justify-content:flex-start;
+        padding-left: 10px;
+    }
+
+    .form-div .line-div .input-div input{
+        border: 0;
+        height: 30px;
+        outline:none;
+        width: 95%;
+        background-color:transparent;
+    }
+    #addToTable{
+        width: 120px;
+        height: 30px;
+        border-radius: 3px;
+        outline:none;
+        font-size: 1.0em;
+        color: #353535;
+        background-color: rgb(244,164,52);
+    }
+    #batchSave{
+        width: 120px;
+        height: 30px;
+        border-radius: 3px;
+        outline:none;
+        font-size: 1.1em;
+        color: #353535;
+        background-color: rgb(244,164,52);
+    }
+</style>
+
+<div class="container">
+    <div class="envelope"></div>
+    <div class="section use-info">
+        <div>操作说明：</div>
+        <div class="use-info-detail">
+            同一个页面只能操作修改一个数据库，如需要操作多个数据库，请在主页选择好数据库后，再执行其它的操作。在正式提交到数据库前，用户可以
+            先手动将要修改的数据加入到表格中，然后执行保存。
+        </div>
+    </div>
+    <div class="section dev-db table-responsive">
+        <table class="table table-bordered">
+            <caption>开发库剩余未发布到测试内容</caption>
+            <thead>
+            <tr>
+                <th>所在库</th>
+                <th>变更者</th>
+                <th>变更项</th>
+                <th>变更原因</th>
+                <th>变更时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{if gt (len .Data) 0}}
+                {{range $i, $v := .Data}}
+                    <tr>
+                        <td>{{ $v.DBName }}</td>
+                        <td>{{ $v.UserName }}</td>
+                        <td>{{ $v.DBItem }}</td>
+                        <td>{{ $v.DBReason }}</td>
+                        <td>{{ $v.CreateTime }}</td>
+                        <td style="cursor:pointer" onclick="removeDev({{$v.Id}})">移除</td>
+                    </tr>
+                {{end}}
+            {{else}}
+                <tr>
+                    <td colspan="5" style="text-align: center">没有进行中变更</td>
+                </tr>
+            {{end}}
+            </tbody>
+        </table>
+    </div>
+    <div class="section add-db table-responsive">
+        <table class="table table-bordered">
+            <caption>本次拟修改开发库内容</caption>
+            <thead>
+            <tr>
+                <th>所在库编号</th>
+                <th>变更项</th>
+                <th>变更原因</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tfoot style="display: none" id="showAddBtn">
+                <tr>
+                    <td colspan="4"><button id="batchSave" type="button">保存提交</button></td>
+                </tr>
+            </tfoot>
+            <tbody id="intend">
+            </tbody>
+        </table>
+    </div>
+    <div class="form-div">
+        <div class="line-div">
+            <div class="label-div">变更项：</div>
+            <div class="input-div"><input type="text" id="dbItem" maxlength="60" autocomplete="off" placeholder="请填写变更项"></div>
+        </div>
+        <div class="line-div">
+            <div class="label-div">变更原因：</div>
+            <div class="input-div"><input type="text" id="dbreason" maxlength="60" autocomplete="off" placeholder="请填写变更内容"></div>
+        </div>
+        <div class="line-div">
+            <div class="label-div"></div>
+            <div class="input-div"><button id="addToTable" type="button">确定</button></div>
+        </div>
+    </div>
+    <div class="envelope"></div>
+</div>
+<script type="text/javascript">
+    // 定义一个本页面全局的数据库id，当前页面只能对同一个数据库操作
+    var dbId = {{.DbId}};
+    // 定义一个数据表对象数组
+    var table = [];
+    $(function(){
+        // 响应用户添加到表事件
+        $("#addToTable").click(function(){
+            var dbItem = $("#dbItem").val().trim();
+            var dbreason = $("#dbreason").val().trim();
+            if(isBank(dbreason) || isBank(dbItem)){
+                zeroModal.error('所有字段都为必填!');
+            }else{
+                table.push({"DBId":dbId,"DBItem":dbItem,"DBReason":dbreason})
+                $("#dbItem").val('');
+                $("#dbreason").val('');
+                display()
+            }
+        });
+
+        $("#batchSave").click(function () {
+            if (table.length <= 0){
+                zeroModal.error('请填写您要修改的内容');
+            }else {
+                zeroModal.confirm("您确认保存",function () {
+                    batchSave()
+                })
+            }
+        })
+    });
+
+    // 验证表单数据
+    function isBank(value){
+        if (value == null || value == "") {
+            return true
+        }else {
+            return false
+        }
+    }
+    
+    // 渲染拟添加表
+    function display() {
+        if (table.length == 0){
+            $("#intend").empty();
+            $("#showAddBtn").hide()
+            return
+        }
+        if($("#showAddBtn").is(':hidden')){
+            $("#showAddBtn").show();
+        }
+        $("#showAddBtn").show()
+        $("#intend").empty();
+        var htmlStr = "";
+        for ( var i = 0; i <table.length; i++){
+            htmlStr += '<tr>';
+            htmlStr += '<td>'+table[i].DBId+'</td>';
+            htmlStr += '<td>'+table[i].DBItem+'</td>';
+            htmlStr += '<td>'+table[i].DBReason+'</td>';
+            htmlStr += '<td style="cursor:pointer" onclick="removeItem('+i+')">移除</td>';
+            htmlStr += '</tr>';
+        }
+        $("#intend").append(htmlStr);
+    }
+
+    // 移除子项
+    function removeItem(index) {
+        table.splice(index, 1);
+        display()
+    }
+
+    // 发送ajax请求
+    function batchSave() {
+        $.ajax({
+            //请求方式
+            type : "POST",
+            //请求地址
+            url : "/db/version/dev",
+            dataType : "json",//返回的数据类型
+            async: false,
+            //数据，json字符串
+            data : JSON.stringify(table),
+            //请求成功
+            success : function(result) {
+                console.log(result.Data)
+                if(result.Code == 0){
+                    // 添加成功后强制刷新当前页面
+                    window.location.reload()
+                }else{
+                    zeroModal.error(result.Msg);
+                }
+            },
+            //请求失败，包含具体的错误信息
+            error : function(err){
+                zeroModal.error('请求接口失败'+err);
+            }
+        });
+    }
+
+    function removeDev(id) {
+        zeroModal.confirm("您确认移除",function () {
+            $.ajax({
+                //请求方式
+                type : "DELETE",
+                //请求地址
+                url : "/db/version/dev",
+                dataType : "json",//返回的数据类型
+                async: false,
+                //数据，json字符串
+                data : JSON.stringify({"Id":id}),
+                //请求成功
+                success : function(result) {
+                    console.log(result.Data)
+                    if(result.Code == 0){
+                        // 移除成功后强制刷新当前页面
+                        window.location.reload()
+                    }else{
+                        zeroModal.error(result.Msg);
+                    }
+                },
+                //请求失败，包含具体的错误信息
+                error : function(err){
+                    zeroModal.error('请求接口失败'+err);
+                }
+            });
+        })
+    }
+
+</script>

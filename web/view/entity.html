@@ -1,0 +1,184 @@
+﻿<style>
+    .container{
+        color: #353535
+    }
+    .envelope {
+        width: 100%;
+        height: 35px;
+        background: rgba(255, 255, 255, 0) url(/public/picture/envolope.svg) repeat-x
+    }
+    .use-info{
+        padding-top: 60px;
+        padding-left: 60px;
+        padding-right: 60px;
+        font-size: 1.2em;
+    }
+    .use-info .use-info-detail{
+        text-indent:60px
+    }
+    .form-div{
+        margin-top: 60px;
+        padding-left: 120px;
+        padding-right: 120px;
+    }
+    .form-div .line-div{
+        height: 60px;
+        display: flex;
+        display: -webkit-flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        margin-bottom: 1em;
+        background: rgba(255, 255, 255, 0) url(/public/picture/input-label.svg) no-repeat left bottom;
+    }
+
+    .form-div .line-div .label-div{
+        width: 160px;
+        height: 100%;
+        display: flex;
+        display: -webkit-flex;
+        align-items: center;
+        justify-content:flex-end;
+        padding-right: 10px;
+        line-height: 30px;
+    }
+    .form-div .line-div .input-div{
+        width: 440px;
+        height: 100%;
+        display: flex;
+        display: -webkit-flex;
+        align-items: center;
+        justify-content:flex-start;
+        padding-left: 10px;
+    }
+
+    .form-div .line-div .input-div input{
+        border: 0;
+        height: 30px;
+        outline:none;
+        width: 80%;
+        background-color:transparent;
+    }
+    .submit{
+        width: 120px;
+        height: 30px;
+        border-radius: 3px;
+        outline:none;
+        font-size: 1.0em;
+        color: #353535;
+        background-color: rgb(244,164,52);
+    }
+</style>
+
+<div class="container">
+    <div class="envelope"></div>
+    <div class="use-info">
+        <div>致使用者：</div>
+        <div class="use-info-detail">
+            本功能模块主要用于根据数据库表名自动生成Java实体对象，其中实体属性的类型根据和描述根据数据表名自动映射转换。
+            在使用前需要填写您的数据库连接属性，以及您要生成实体对象的表名。注意：若要连接到您的内网中使用，请将本服务单独架设到内网中，
+            否则您无法连接到数据库。
+        </div>
+    </div>
+    <div class="form-div">
+        <div class="line-div">
+            <div class="label-div">数据库Url：</div>
+            <div class="input-div"><input type="text" id="ipAddr" maxlength="20" autocomplete="off" placeholder="数据库服务器地址"></div>
+        </div>
+        <div class="line-div">
+            <div class="label-div">端口：</div>
+            <div class="input-div"><input type="text" id="port" maxlength="6" autocomplete="off" placeholder="数据库服务器端口"></div>
+        </div>
+        <div class="line-div">
+            <div class="label-div">用户名：</div>
+            <div class="input-div"><input type="text" id="userName" maxlength="20" autocomplete="off" placeholder="数据库服务器用户名"></div>
+        </div>
+        <div class="line-div">
+            <div class="label-div">密码：</div>
+            <div class="input-div"><input type="text" id="passWord" maxlength="30" autocomplete="off" placeholder="数据库服务器密码"></div>
+        </div>
+        <div class="line-div">
+            <div class="label-div">数据库名：</div>
+            <div class="input-div"><input type="text" id="DBName" maxlength="20" autocomplete="off" placeholder="数据库名"></div>
+        </div>
+        <div class="line-div">
+            <div class="label-div">表名：</div>
+            <div class="input-div"><input type="text" id="tableName" maxlength="20" autocomplete="off" placeholder="表名"></div>
+        </div>
+        <div class="line-div">
+            <div class="label-div"></div>
+            <div class="input-div"><button class="submit" id="submit" type="button">生成</button></div>
+        </div>
+    </div>
+    <div class="envelope"></div>
+</div>
+<script type="text/javascript">
+    $(function(){
+
+        // 提交表单
+        $("#submit").click(function(){
+            var userName = $("#userName").val().trim();
+            var passWord = $("#passWord").val().trim();
+            var ipAddr = $("#ipAddr").val().trim();
+            var port = $("#port").val().trim();
+            var DBName = $("#DBName").val().trim();
+            var tableName = $("#tableName").val().trim();
+            if(isBank(userName) || isBank(passWord) || isBank(ipAddr) || isBank(port) || isBank(DBName) || isBank(tableName)){
+                zeroModal.error('所有字段都为必填!');
+            }else{
+                var parma = {
+                    "userName": userName,
+                    "passWord": passWord,
+                    "ipAddr": ipAddr,
+                    "port": port,
+                    "DBName": DBName,
+                    "tableName": tableName
+                }
+                sendParma(parma)
+            }
+
+        });
+    });
+
+    // 验证表单数据
+    function isBank(value){
+        if (value == null || value == "") {
+            return true
+        }else {
+            return false
+        }
+    }
+
+    // 发送ajax请求
+    function sendParma(parma) {
+        $.ajax({
+            //请求方式
+            type : "POST",
+            //请求地址
+            url : "/tools/api/javaentity",
+            dataType : "json",//返回的数据类型
+            //数据，json字符串
+            data : JSON.stringify(parma),
+            //请求成功
+            success : function(result) {
+                if(result.Code == 0){
+                    console.log();
+                    zeroModal.show({
+                        title: '生成实体对象',
+                        content: "<p style='white-space: pre;'>"+result.Data+"</p>",
+                        width: '60%',
+                        height: '60%',
+                        opacity: 0.8
+                    });
+                }else{
+                    zeroModal.error(result.Msg);
+                }
+            },
+            //请求失败，包含具体的错误信息
+            error : function(err){
+                zeroModal.error('请求接口失败'+err);
+            }
+        });
+    }
+
+</script>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="shortcut icon" type="image/x-icon" href="/public/picture/favicon.ico"/>
+    <link rel="stylesheet" type="text/css" href="/public/css/rest.css">
+    <link rel="stylesheet" type="text/css" href="/public/css/table.css">
+    <link rel="stylesheet" href="/public/plugins/zeroModal/css/zeroModal.css">
+    <title>{{.Title}}</title>
+    <script src="/public/js/jquery.min.js"></script>
+    <script src="/public/plugins/zeroModal/js/zeroModal.js"></script>
+</head>
+<style>
+    .my-header {
+        padding-bottom: 0;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        background: #FFF;
+        width: 100%;
+        height: 80px;
+        box-shadow: 0px 3px 5px rgba(125, 125, 125, 0.2);
+        display: flex;
+        align-items: center;
+        padding-left: 60px;
+    }
+
+    .my-header ul {
+        height: 50px;
+    }
+
+    .my-header ul li {
+        float: left;
+        list-style: none;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .my-section {
+        background: #f8efe5;
+        margin-top: 80px;
+        padding: 60px;
+    }
+
+    .my-section .menu-title {
+        height: 120px;
+        width: 260px;
+        color: #353535;
+        background: rgba(255, 255, 255, 0) url(/public/picture/title.svg) no-repeat center center;
+        background-size: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5em
+    }
+
+    .my-footer {
+        padding: 60px;
+        background-color: #fff
+    }
+
+    .my-footer .footer-content{
+       width: 100%;
+    }
+
+    .my-footer .footer-content .footerLeft{
+        width: 50%;
+        float: left;
+    }
+
+    .my-footer .footer-content .footerLeft .auxiliaryMenu{
+        line-height: 20px;
+    }
+
+    .my-footer .footer-content .footerLeft .auxiliaryMenu li{
+        display: inline-block;
+        float: none;
+        box-sizing: border-box;
+        padding-right: 10px;
+        margin-right: 10px;
+        position: relative;
+        margin-bottom: 5px;
+    }
+
+    .my-footer .footer-content .footerLeft .auxiliaryMenu li > * {
+        font-size: 0.75rem;
+        color: #353535;
+        cursor: pointer;
+    }
+
+    .my-footer .footer-content .footerLeft .auxiliaryMenu  .listBreaker{
+        padding: 0;
+        margin: 0;
+        display: block;
+        height: 0;
+    }
+
+    .my-footer .footer-content .footerRight{
+        width: 50%;
+        float: left;
+    }
+
+    .my-footer .footer-content .footerRight .gridBlock {
+        display: inline-block;
+        vertical-align: middle;
+        float: none;
+        margin-right: 40px;
+    }
+</style>
+<body>
+<header class="my-header">
+    <ul>
+        <li>
+            <div style="height: 25px;width: 300px; background: rgba(255, 255, 255, 0) url(/public/picture/project.svg) no-repeat center center;"></div>
+        </li>
+    </ul>
+</header>
+<section class="my-section">
+    <div class="menu-title">
+        {{.FuncName}}
+    </div>
+    <div>
+        {{yield}}
+    </div>
+</section>
+<footer class="my-footer">
+    <div class="footer-content">
+        <div class="footerLeft">
+            <ul class="auxiliaryMenu">
+                <li><a href="javascript:void(0)" title="关于我们">关于我们</a></li>
+                <li><a href="javascript:void(0)" title="网站地图">网站地图</a></li>
+                <li><a href="javascript:void(0)" title="帮助">帮助</a></li>
+                <li><a href="javascript:void(0)" title="免责声明">免责声明</a></li>
+                <li><a href="javascript:void(0)" title="保护隐私">保护隐私</a></li>
+                <li class="listBreaker"><span></span></li>
+                <li><a href="javascript:void(0)">Copyright &copy; 2016-<script>document.write(new Date().getFullYear())</script> Saya.ac.cn-暖心阁 All rights reserved</a> </li>
+            </ul>
+        </div>
+        <div class="footerRight">
+            <div class="gridBlock"><a id="footerLogoAA" href="https://validator.w3.org/check?uri=referer" title="符合万维网联盟有关无障碍网页设计指引中XHTML的要求" rel="external" data-govhk-window="new-full-win"><img src="https://www.w3.org/Icons/valid-xhtml10" alt="符合萬維網聯盟有關無障礙網頁設計指引中2A級別的要求"></a></div>
+            <div class="gridBlock"><a id="footerLogoR6" href="https://jigsaw.w3.org/css-validator/" title="符合万维网联盟有关无障碍网页设计指引中CSS的要求" rel="external" data-govhk-window="new-full-win"><img src="https://jigsaw.w3.org/css-validator/images/vcss" alt="IPv6 電腦器材可瀏覽本網站"></a></div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
