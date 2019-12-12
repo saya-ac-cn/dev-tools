@@ -12,3 +12,4 @@
 * linux后台运行nohup ./dev-tools >./warn.log 2>&1 &
 ## 当前功能
 * 自动生成Java实体对象
+* 数据库版本管理
